@@ -14,4 +14,10 @@ public class GlobalExceptionHandler {
         ExceptionResponse response = ExceptionResponse.builder().status(HttpStatus.NOT_FOUND).message(ex.getMessage()).build();
         return ResponseEntity.status(404).body(response);
     }
+
+    @ExceptionHandler(IncorrectRangeException.class)
+    public ResponseEntity<ExceptionResponse> InCorrectRangeExceptionHandler(Exception ex) {
+        ExceptionResponse response = ExceptionResponse.builder().status(HttpStatus.BAD_REQUEST).message(ex.getMessage()).build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
 }

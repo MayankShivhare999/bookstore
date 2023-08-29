@@ -1,6 +1,6 @@
 package com.advanz101.bookstore.exceptions;
 
-public class BookNotFoundException extends RuntimeException{
+public class BookNotFoundException extends Exception{
 
     public BookNotFoundException(){
         super();
