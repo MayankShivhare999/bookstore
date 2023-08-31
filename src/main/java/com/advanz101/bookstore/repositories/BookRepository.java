@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BookRespository extends JpaRepository<Book, String> {
+public interface BookRepository extends JpaRepository<Book, String> {
     List<Book> findByPriceBetween(double minPrice, double maxPrice);
 }

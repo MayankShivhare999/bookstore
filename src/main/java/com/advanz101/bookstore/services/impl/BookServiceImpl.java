@@ -3,7 +3,7 @@ package com.advanz101.bookstore.services.impl;
 import com.advanz101.bookstore.entity.Book;
 import com.advanz101.bookstore.exceptions.BookNotFoundException;
 import com.advanz101.bookstore.exceptions.IncorrectRangeException;
-import com.advanz101.bookstore.repositories.BookRespository;
+import com.advanz101.bookstore.repositories.BookRepository;
 import com.advanz101.bookstore.services.BookService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,13 +16,13 @@ import java.util.UUID;
 @Service
 public class BookServiceImpl implements BookService {
 
-    private final BookRespository bookRespository;
+    private final BookRepository bookRepository;
 
     private Logger logger = LoggerFactory.getLogger(BookServiceImpl.class);
 
     @Autowired
-    BookServiceImpl(BookRespository bookRespository) {
-        this.bookRespository = bookRespository;
+    BookServiceImpl(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
     }
 
     /**
@@ -36,7 +36,7 @@ public class BookServiceImpl implements BookService {
         UUID uuid = UUID.randomUUID();
         book.setId(uuid.toString());
         logger.info("id : {} generated", uuid);
-        return bookRespository.save(book);
+        return bookRepository.save(book);
     }
 
     /**
@@ -46,7 +46,7 @@ public class BookServiceImpl implements BookService {
      */
     @Override
     public List<Book> getBooks() {
-        return bookRespository.findAll();
+        return bookRepository.findAll();
     }
 
     /**
@@ -58,7 +58,7 @@ public class BookServiceImpl implements BookService {
      */
     @Override
     public Book getBookById(String bookId) throws BookNotFoundException {
-        return bookRespository.findById(bookId)
+        return bookRepository.findById(bookId)
                 .orElseThrow(() ->
                         new BookNotFoundException("Book Not Found with Id: "+bookId));
     }
@@ -73,12 +73,12 @@ public class BookServiceImpl implements BookService {
      */
     @Override
     public Book updateBook(String bookId, Book book) throws BookNotFoundException {
-        if(!bookRespository.existsById(bookId)) {
+        if(!bookRepository.existsById(bookId)) {
             logger.info("Book not found with bookId : {}", bookId);
             throw new BookNotFoundException("Book Not Found with Id: "+bookId);
         }
         book.setId(bookId);
-        return bookRespository.save(book);
+        return bookRepository.save(book);
     }
 
     /**
@@ -90,8 +90,12 @@ public class BookServiceImpl implements BookService {
      */
     @Override
     public Book deleteBook(String bookId) throws BookNotFoundException {
-        Book book = bookRespository.findById(bookId).orElseThrow(() -> new BookNotFoundException("Book Not Found with Id: "+bookId));
-        bookRespository.deleteById(bookId);
+        if(!bookRepository.existsById(bookId)) {
+            logger.info("Book not found with bookId : {}", bookId);
+            throw new BookNotFoundException("Book Not Found with Id: "+bookId);
+        }
+        Book book = bookRepository.findById(bookId).get();
+        bookRepository.deleteById(bookId);
         return book;
     }
 
@@ -107,6 +111,6 @@ public class BookServiceImpl implements BookService {
         if(maxPrice < minPrice) {
             throw new IncorrectRangeException("Enter Correct Range");
         }
-        return bookRespository.findByPriceBetween(minPrice, maxPrice);
+        return bookRepository.findByPriceBetween(minPrice, maxPrice);
     }
 }
